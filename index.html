@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melacolyn — Interactive 3D Studio</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 3D Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <span class="brand-mark"></span>
+            <span class="brand-name">Melacolyn</span>
+        </div>
+        <div class="nav-actions">
+            <button class="btn btn-ghost" id="btn-reset" title="Reset camera">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                Reset
+            </button>
+            <button class="btn btn-ghost" id="btn-screenshot" title="Take screenshot">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                Capture
+            </button>
+            <button class="btn btn-primary" id="btn-upload">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Upload Model
+            </button>
+        </div>
+    </nav>
+
+    <!-- Left Panel: Scene Controls -->
+    <aside class="panel panel-left">
+        <div class="panel-header">
+            <h2>Scene</h2>
+        </div>
+
+        <div class="control-section">
+            <div class="control-row">
+                <span class="control-label">Auto Rotate</span>
+                <div class="toggle active" id="toggle-rotate"></div>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <div class="control-row">
+                <span class="control-label">Rotation Speed</span>
+                <span class="control-value" id="speed-value">1.0x</span>
+            </div>
+            <input type="range" class="slider" id="slider-speed" min="0.1" max="5" step="0.1" value="1">
+        </div>
+
+        <div class="control-section">
+            <div class="control-row">
+                <span class="control-label">Zoom</span>
+                <span class="control-value" id="zoom-value">1.0x</span>
+            </div>
+            <input type="range" class="slider" id="slider-zoom" min="0.3" max="3" step="0.1" value="1">
+        </div>
+
+        <div class="control-section">
+            <div class="control-row">
+                <span class="control-label">Light Intensity</span>
+                <span class="control-value" id="light-value">1.0x</span>
+            </div>
+            <input type="range" class="slider" id="slider-light" min="0" max="3" step="0.1" value="1">
+        </div>
+
+        <div class="control-section">
+            <div class="control-row">
+                <span class="control-label">Background</span>
+            </div>
+            <div class="color-grid" id="bg-colors">
+                <div class="color-swatch active" style="background:#0a0a0f" data-color="#0a0a0f"></div>
+                <div class="color-swatch" style="background:#1a1a2e" data-color="#1a1a2e"></div>
+                <div class="color-swatch" style="background:#16213e" data-color="#16213e"></div>
+                <div class="color-swatch" style="background:#0f3460" data-color="#0f3460"></div>
+                <div class="color-swatch" style="background:#2d2d2d" data-color="#2d2d2d"></div>
+                <div class="color-swatch" style="background:#f5f5f5" data-color="#f5f5f5"></div>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <div class="control-row">
+                <span class="control-label">Material Tint</span>
+            </div>
+            <div class="color-grid" id="material-colors">
+                <div class="color-swatch active" style="background:#6c5ce7" data-color="#6c5ce7"></div>
+                <div class="color-swatch" style="background:#00b894" data-color="#00b894"></div>
+                <div class="color-swatch" style="background:#e17055" data-color="#e17055"></div>
+                <div class="color-swatch" style="background:#fdcb6e" data-color="#fdcb6e"></div>
+                <div class="color-swatch" style="background:#74b9ff" data-color="#74b9ff"></div>
+                <div class="color-swatch" style="background:#ffffff" data-color="#ffffff"></div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Right Panel: Object Info -->
+    <aside class="panel panel-right" id="info-panel">
+        <div class="panel-header">
+            <h2>Inspector</h2>
+        </div>
+        <div class="inspector-content" id="inspector-content">
+            <div class="inspector-empty">
+                <p>Click any object in the scene to inspect it</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Bottom Bar: Object List -->
+    <div class="bottom-bar" id="object-bar">
+        <div class="object-list" id="object-list">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="upload-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Upload 3D Model</h2>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="drop-zone" id="drop-zone">
+                    <div class="drop-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    </div>
+                    <p class="drop-text">Drag & drop your <strong>.glb</strong> or <strong>.gltf</strong> file here</p>
+                    <p class="drop-sub">or click to browse</p>
+                    <button class="btn btn-primary" id="btn-browse">Browse Files</button>
+                    <input type="file" id="file-input" accept=".glb,.gltf" hidden>
+                </div>
+                <div class="modal-tips">
+                    <p><strong>Tip:</strong> Export from Blender via <code>File → Export → glTF 2.0 (.glb)</code></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Loading model...</p>
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- Screenshot Flash -->
+    <div class="flash" id="flash"></div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
