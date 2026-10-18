@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/Seia.glb" id="1_model"]
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="2_script"]
+
+[sub_resource type="CapsuleShape3D" id="capsule_player"]
+radius = 0.25
+height = 1.05
+
+[node name="Player" type="CharacterBody3D" groups=["player"]]
+script = ExtResource("2_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.525, 0)
+shape = SubResource("capsule_player")
+
+[node name="Visual" type="Node3D" parent="."]
+rotation = Vector3(0, 3.1415927, 0)
+
+[node name="Seia" parent="Visual" instance=ExtResource("1_model")]
